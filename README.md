@@ -34,4 +34,4 @@ Le composant principale est [Chatbot.vue](/src/components/Chatbot.vue), il défi
 
 ## Known Issues
 
-A l'heure actuelle l'API du chatbot met trop de temps à répondre, c'est pourquoi les questions demandants les offres d'emploi déclenche une erreur.
+A l'heure actuelle l'API du chatbot met trop de temps à répondre, c'est pourquoi les questions demandants les offres d'emploi déclenchent une erreur.
