@@ -31,6 +31,17 @@
   display: inline-block;
   margin: 10px;
 }
+
+.list {
+  display: inline-block;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid gray;
+  background-color: lightgray;
+  width: auto;
+  border-radius: 4px;
+  text-align: left;
+}
 </style>
 
 <template>
@@ -39,9 +50,17 @@
       <div class="messages" 
           v-for="display in displays"
           v-bind:key="display.id">
-        <div v-bind:class="{ bot: display.who === 'bot', person: display.who === 'person' }">
+        <div v-if="display.type == 'text'" 
+              v-bind:class="{ bot: display.who === 'bot', person: display.who === 'person' }">
           <div class="message">
             {{display.message}}
+          </div>
+        </div>
+        <div v-else-if="display.type == 'list'"
+              class="list">
+          <div v-for="item in display.items"
+              v-bind:key="item.title">
+            {{item.title}}
           </div>
         </div>
       </div>
@@ -77,6 +96,7 @@ export default {
   methods: {
     addBotMessage(message) {
       this.displays.push({
+        type: "text",
         message: message,
         who: "bot"
       });
@@ -84,14 +104,21 @@ export default {
     addSuggestions(suggestions) {
       this.suggestions = suggestions;
     },
+    addList(list){
+      this.displays.push({
+        type: "list",
+        items: list
+      })
+    },
     selectSuggestion(message) {
       this.suggestions = [];
       this.send(message);
     },
     displayResponses(responses) {
-      responses.forEach(this.displayResponse);
+      responses.messages.forEach(this.displayResponseMessage);
+      this.displayResponseData(responses.data);
     },
-    displayResponse(res) {
+    displayResponseMessage(res) {
       switch (res.type) {
         case "simple_response":
           this.addBotMessage(res.textToSpeech);
@@ -102,10 +129,19 @@ export default {
         case 0:
           this.addBotMessage(res.speech);
           break;
+        default:
+          this.addBotMessage(res);
+          break;
       }
     },
+    displayResponseData(data) {
+      try {
+        var list = data.google.system_intent.spec.option_value_spec.list_select.items;
+        this.addList(list)
+      } catch (error) {}
+    },
     askChatbot(req) {
-      this.addAwaiter()
+      this.addAwaiter();
       Dialogflow.askChatbot(req)
         .catch(err => {
           this.addBotMessage(
@@ -116,27 +152,28 @@ export default {
           this.displayResponses(res);
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
         })
-        .then(this.removeAwaiter)
+        .then(this.removeAwaiter);
     },
     askChatbotEvent(req) {
-      this.addAwaiter()
+      this.addAwaiter();
       Dialogflow.requestEventChatbot(req)
-      .then(this.displayResponses)
+        .then(this.displayResponses)
         .catch(err => {
-          console.log(err)
+          console.log(err);
         })
-        .then(this.removeAwaiter)
+        .then(this.removeAwaiter);
     },
     addAwaiter() {
-      this.awaiting = true
+      this.awaiting = true;
     },
     removeAwaiter() {
-      this.awaiting = false
+      this.awaiting = false;
     },
     send(message) {
       this.displays.push({
+        type: "text",
         message: message,
         who: "person"
       });
