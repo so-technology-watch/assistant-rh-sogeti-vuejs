@@ -22,7 +22,8 @@ function clearChatbotResponse(res) {
         }
         return 0
       }),
-      data: res.result.fulfillment.data
+      data: res.result.fulfillment.data,
+      context: res.result.contexts
     }
   } else {
     throw res.status

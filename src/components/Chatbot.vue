@@ -31,17 +31,6 @@
   display: inline-block;
   margin: 10px;
 }
-
-.list {
-  display: inline-block;
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid gray;
-  background-color: lightgray;
-  width: auto;
-  border-radius: 4px;
-  text-align: left;
-}
 </style>
 
 <template>
@@ -57,11 +46,17 @@
           </div>
         </div>
         <div v-else-if="display.type == 'list'"
-              class="list">
+              class="message bot list">
           <div v-for="item in display.items"
-              v-bind:key="item.title">
-            {{item.title}}
+              v-bind:key="item.Metier">
+            <button v-on:click="selectOffer(item)">{{item.Poste}}</button>
           </div>
+        </div>
+        <div v-else-if="display.type == 'offer'"
+              class="message bot offer">
+            <h2 class="offer_title">{{display.offer.Poste}}</h2>
+            <p>{{display.offer.Description}}</p>
+            <a v-bind:href="display.offer.url" target="_blank">Voir en ligne</a>
         </div>
       </div>
     </div>
@@ -72,8 +67,8 @@
         </div>
       </div>
       <div v-if="awaiting">Waiting...</div>
-      <input type="text" v-model="message" placeholder="..." @keyup.enter="send(message)"/>
-      <button v-on:click="send(message)">Envoyer</button>
+      <input type="text" v-model="message" placeholder="..." @keyup.enter="addAndSend(message)"/>
+      <button v-on:click="addAndSend(message)">Envoyer</button>
     </div>
   </div>
 </template>
@@ -101,22 +96,52 @@ export default {
         who: "bot"
       });
     },
+    addUserMessage(message) {
+      this.displays.push({
+        type: "text",
+        message: message,
+        who: "person"
+      });
+    },
     addSuggestions(suggestions) {
       this.suggestions = suggestions;
     },
-    addList(list){
+    addList(list) {
       this.displays.push({
         type: "list",
         items: list
-      })
+      });
+    },
+    addOneOffer(offer) {
+      this.displays.push({
+        type: "offer",
+        offer: offer
+      });
+    },
+    addError() {
+      this.addBotMessage(
+        "Désolé, il y a eu un problème de connexion au Chatbot"
+      );
     },
     selectSuggestion(message) {
       this.suggestions = [];
-      this.send(message);
+      this.addAndSend(message);
     },
-    displayResponses(responses) {
-      responses.messages.forEach(this.displayResponseMessage);
-      this.displayResponseData(responses.data);
+    selectOffer(offer) {
+      this.addUserMessage(offer.Poste);
+      this.addOneOffer(offer);
+    },
+    treatChatbotResponse(response) {
+      response.messages.forEach(this.displayResponseMessage);
+      if (response.context.length > 0) {
+        var listOffersContext = response.context.filter(context => {
+          return context.name == "context_list_offers";
+        });
+        console.log(listOffersContext);
+        if (listOffersContext.length>0) {
+          this.addList(listOffersContext[0].parameters.Offers_presented)
+        }
+      }
     },
     displayResponseMessage(res) {
       switch (res.type) {
@@ -130,26 +155,25 @@ export default {
           this.addBotMessage(res.speech);
           break;
         default:
-          this.addBotMessage(res);
+          this.addError();
           break;
       }
     },
     displayResponseData(data) {
       try {
-        var list = data.google.system_intent.spec.option_value_spec.list_select.items;
-        this.addList(list)
+        var list =
+          data.google.system_intent.spec.option_value_spec.list_select.items;
+        this.addList(list);
       } catch (error) {}
     },
     askChatbot(req) {
       this.addAwaiter();
       Dialogflow.askChatbot(req)
         .catch(err => {
-          this.addBotMessage(
-            "Désolé, il y a eu un problème de connexion au Chatbot"
-          );
+          this.addError();
         })
         .then(res => {
-          this.displayResponses(res);
+          this.treatChatbotResponse(res);
         })
         .catch(err => {
           console.log(err);
@@ -159,7 +183,7 @@ export default {
     askChatbotEvent(req) {
       this.addAwaiter();
       Dialogflow.requestEventChatbot(req)
-        .then(this.displayResponses)
+        .then(this.treatChatbotResponse)
         .catch(err => {
           console.log(err);
         })
@@ -172,13 +196,12 @@ export default {
       this.awaiting = false;
     },
     send(message) {
-      this.displays.push({
-        type: "text",
-        message: message,
-        who: "person"
-      });
       this.askChatbot(message);
       this.message = "";
+    },
+    addAndSend(message) {
+      this.addUserMessage(message);
+      this.send(message);
     }
   }
 };
