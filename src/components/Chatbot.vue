@@ -200,6 +200,7 @@ export default {
       this.message = "";
     },
     addAndSend(message) {
+      this.suggestions = []
       this.addUserMessage(message);
       this.send(message);
     }
