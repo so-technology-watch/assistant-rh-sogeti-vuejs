@@ -82,7 +82,8 @@ export default {
       displays: [],
       suggestions: [],
       message: "",
-      awaiting: true
+      awaiting: true,
+      currentOfferList: []
     };
   },
   created() {
@@ -137,8 +138,11 @@ export default {
         var listOffersContext = response.context.filter(context => {
           return context.name == "context_list_offers";
         });
-        console.log(listOffersContext);
-        if (listOffersContext.length>0) {
+        console.log("current: ", this.currentOfferList);
+        console.log("new: ", listOffersContext[0].parameters.Offers_presented);
+        console.log("equal:", listOffersContext[0].parameters.Offers_presented == this.currentOfferList);
+        if (listOffersContext.length>0 && listOffersContext[0].parameters.Offers_presented != this.currentOfferList) {
+          this.currentOfferList = listOffersContext[0].parameters.Offers_presented
           this.addList(listOffersContext[0].parameters.Offers_presented)
         }
       }
