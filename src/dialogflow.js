@@ -9,7 +9,8 @@ import {
 
 
 const client = new ApiAiClient({
-  accessToken: 'f8c540d1fa9b4014b11b5075ee5222bc',
+  accessToken: 'ba80c0dd3f57459da3d41285e3fddcdf',
+
   lang: ApiAiConstants.AVAILABLE_LANGUAGES.FR
 })
 
