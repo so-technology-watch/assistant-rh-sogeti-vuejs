@@ -1,10 +1,6 @@
 import {
   ApiAiClient,
-  ApiAiConstants,
-  IStringMap,
-  IRequestOptions,
-  IApiClientOptions,
-  IServerResponse
+  ApiAiConstants
 } from "api-ai-javascript"
 
 

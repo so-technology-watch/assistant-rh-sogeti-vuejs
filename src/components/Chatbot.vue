@@ -1,41 +1,7 @@
-<style scoped>
-.messages {
-  width: 100%;
-}
-.message {
-  display: inline-block;
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid gray;
-  background-color: lightgray;
-  width: auto;
-  border-radius: 4px;
-}
-.bot {
-  text-align: left;
-}
-.bot .message {
-  background-color: #aaddaa;
-  border-color: #88dd88;
-  color: #003300;
-}
-.person {
-  text-align: right;
-}
-.person .message {
-  background-color: #aaaadd;
-  border-color: #8888dd;
-  color: #000033;
-}
-.suggestion {
-  display: inline-block;
-  margin: 10px;
-}
-</style>
 
 <template>
-  <div>
-    <div>
+  <div id="assistant">
+    <div id="conversation">
       <div class="messages" 
           v-for="display in displays"
           v-bind:key="display.id">
@@ -60,7 +26,7 @@
         </div>
       </div>
     </div>
-    <div>
+    <div id="input">
       <div class="suggestions">
         <div class="suggestion" v-for="{title} in suggestions" :key="title">
           <button v-on:click="selectSuggestion(title)">{{title}}</button>
@@ -75,6 +41,7 @@
 
 <script>
 import * as Dialogflow from "../dialogflow";
+
 export default {
   name: "Chatbot",
   data() {
@@ -85,6 +52,16 @@ export default {
       awaiting: true,
       currentOfferList: []
     };
+  },
+  updated: function() {
+      var container = this.$el.querySelector("#conversation");
+      container.scrollTop = container.scrollHeight;
+  },
+  watch: {
+    displays: function(val) {
+      var container = this.$el.querySelector("#conversation");
+      container.scrollTop = container.scrollHeight;
+    }
   },
   created() {
     this.askChatbotEvent("WELCOME");
@@ -138,9 +115,6 @@ export default {
         var listOffersContext = response.context.filter(context => {
           return context.name == "context_list_offers";
         });
-        console.log("current: ", this.currentOfferList);
-        console.log("new: ", listOffersContext[0].parameters.Offers_presented);
-        console.log("equal:", listOffersContext[0].parameters.Offers_presented == this.currentOfferList);
         if (listOffersContext.length>0 && listOffersContext[0].parameters.Offers_presented != this.currentOfferList) {
           this.currentOfferList = listOffersContext[0].parameters.Offers_presented
           this.addList(listOffersContext[0].parameters.Offers_presented)
@@ -211,3 +185,60 @@ export default {
   }
 };
 </script>
+
+<style>
+#assistant {
+  height: 400px;
+  width: 300px;
+  box-shadow: 5px 5px 10px 5px #66888888;
+  position: fixed;
+  bottom: 0;
+  right: 50px;
+  padding: 3px;
+}
+#conversation {
+  width: 100%;
+  height: 90%;
+  overflow-y: scroll;
+  
+}
+#input {
+  /* width: 100%; */
+  height: 10%;
+  /* position: fixed; */
+  bottom: 10px;
+}
+.messages {
+  width: 100%;
+  text-align: left;
+}
+.message {
+  display: inline-block;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid gray;
+  background-color: lightgray;
+  width: auto;
+  border-radius: 4px;
+}
+.bot {
+  text-align: left;
+}
+.bot .message {
+  background-color: #aaddaa;
+  border-color: #88dd88;
+  color: #003300;
+}
+.person {
+  text-align: right;
+}
+.person .message {
+  background-color: #aaaadd;
+  border-color: #8888dd;
+  color: #000033;
+}
+.suggestion {
+  display: inline-block;
+  margin: 10px;
+}
+</style>
