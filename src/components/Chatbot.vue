@@ -2,7 +2,7 @@
 <template>
   <div id="assistant">
     <div id="conversation">
-      <div class="messages" 
+      <div class="messages"
           v-for="display in displays"
           v-bind:key="display.id">
         <div v-if="display.type == 'text'" 

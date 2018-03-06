@@ -1,12 +1,17 @@
 <template>
   <div id="app">
-    <router-view/>
+    <Chatbot/>
   </div>
 </template>
 
 <script>
+import Chatbot from './components/Chatbot.vue'
+
 export default {
-  name: 'app'
+  name: 'app',
+  components: {
+    Chatbot
+  }
 }
 </script>
 
@@ -17,6 +22,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
