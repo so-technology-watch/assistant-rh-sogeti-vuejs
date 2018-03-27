@@ -14,17 +14,19 @@
 
 <style>
 #assistant {
-  height: 400px;
-  width: 400px;
+  font: 400 13.3333px 'Roboto';
+  height: 500px;
+  width: 350px;
   box-shadow: 5px 5px 10px 5px #0c141488;
   background-color: white;
   position: fixed;
   bottom: 0;
   right: 50px;
-  padding: 3px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  border-top: 5px solid rgb(255, 102, 46);
+  border-radius: 7px 7px 0 0;
 }
 #conversation {
   width: 100%;
@@ -36,39 +38,6 @@
   bottom: 0;
 }
 #suggestions {
-  display: inline-block;
-  margin: 10px;
-}
-.messages {
-  width: 100%;
-  text-align: left;
-}
-.message {
-  display: inline-block;
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid gray;
-  background-color: lightgray;
-  width: auto;
-  border-radius: 4px;
-}
-.bot {
-  text-align: left;
-}
-.bot .message {
-  background-color: #aaddaa;
-  border-color: #88dd88;
-  color: #003300;
-}
-.person {
-  text-align: right;
-}
-.person .message {
-  background-color: #aaaadd;
-  border-color: #8888dd;
-  color: #000033;
-}
-.suggestion {
   display: inline-block;
   margin: 10px;
 }
@@ -130,12 +99,14 @@ export default {
     addList(list) {
       this.displays.push({
         type: "list",
+        who: "bot",
         items: list
       });
     },
     addOneOffer(offer) {
       this.displays.push({
         type: "offer",
+        who: "bot",
         offer: offer
       });
     },
