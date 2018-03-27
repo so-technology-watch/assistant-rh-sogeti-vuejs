@@ -1,4 +1,3 @@
-
 <template>
   <div id="assistant">
     <div id="conversation">
@@ -43,7 +42,7 @@
 import * as Dialogflow from "../dialogflow";
 
 export default {
-  name: "Chatbot",
+  name: "Popup",
   data() {
     return {
       displays: [],
@@ -191,6 +190,7 @@ export default {
   height: 400px;
   width: 300px;
   box-shadow: 5px 5px 10px 5px #66888888;
+  background-color: white;
   position: fixed;
   bottom: 0;
   right: 50px;
@@ -199,8 +199,7 @@ export default {
 #conversation {
   width: 100%;
   height: 90%;
-  overflow-y: scroll;
-  
+  overflow-y: auto;
 }
 #input {
   /* width: 100%; */
